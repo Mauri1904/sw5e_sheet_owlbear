@@ -14,3 +14,4 @@ This project is an **unofficial** character sheet extension intended to support 
 - All rights to SW5E and related materials belong to their respective owners.
 
 If you believe this project infringes on your rights, please open an issue or contact me.
+
