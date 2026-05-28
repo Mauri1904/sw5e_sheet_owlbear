@@ -111,22 +111,6 @@ input:focus {
   transform: translateY(-1px);
 }
 
-.level {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.level__value {
-  font: 600 20px/1 var(--font-mono);
-  color: var(--accent);
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(47, 107, 95, 0.08);
-  min-width: 56px;
-  text-align: center;
-}
 
 @keyframes float-in {
   from {

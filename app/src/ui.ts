@@ -31,18 +31,15 @@ export function renderApp(
         </label>
         <label class="field" for="character-level">
           <span class="field__label">Level</span>
-          <div class="level">
-            <input
-              id="character-level"
-              name="character-level"
-              type="number"
-              inputmode="numeric"
-              min="1"
-              max="20"
-              step="1"
-            />
-            <span class="level__value" id="level-value" aria-hidden="true"></span>
-          </div>
+          <input
+            id="character-level"
+            name="character-level"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="20"
+            step="1"
+          />
         </label>
       </section>
     </main>
@@ -50,9 +47,8 @@ export function renderApp(
 
   const nameInput = root.querySelector<HTMLInputElement>("#character-name");
   const levelInput = root.querySelector<HTMLInputElement>("#character-level");
-  const levelValue = root.querySelector<HTMLSpanElement>("#level-value");
 
-  if (!nameInput || !levelInput || !levelValue) {
+  if (!nameInput || !levelInput) {
     throw new Error("Sheet UI failed to render.");
   }
 
@@ -62,7 +58,6 @@ export function renderApp(
     current = next;
     nameInput.value = next.name;
     levelInput.value = String(next.level);
-    levelValue.textContent = String(next.level);
   };
 
   const getNameInput = () => nameInput.value.trim() || "New Character";
