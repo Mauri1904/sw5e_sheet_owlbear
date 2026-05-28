@@ -3,7 +3,7 @@ owlbear extension to use sw5e sheets
 
 ## License
 
-This repository’s **source code** is licensed under the MIT License (see `MIT-LICENSE`).
+This repository’s **source code** is licensed under the MIT License (see `LICENSE`).
 
 ## Third‑party content / game system
 
