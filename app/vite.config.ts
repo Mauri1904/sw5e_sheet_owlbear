@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  server: {
-    cors: true,
-  },
+  base: "/sw5e_sheet_owlbear/",
+  server: { cors: true },
 });
