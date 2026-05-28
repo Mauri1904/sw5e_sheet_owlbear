@@ -35,12 +35,12 @@ const normalizeCharacter = (value: unknown): CharacterData => {
 };
 
 export async function getCharacter(): Promise<CharacterData> {
-  const metadata = await OBR.room.getMetadata();
+  const metadata = await OBR.player.getMetadata();
   return normalizeCharacter(metadata[CHARACTER_KEY]);
 }
 
 export async function setCharacter(data: CharacterData): Promise<void> {
-  await OBR.room.setMetadata({
+  await OBR.player.setMetadata({
     [CHARACTER_KEY]: data,
   });
 }
@@ -48,7 +48,7 @@ export async function setCharacter(data: CharacterData): Promise<void> {
 export function onCharacterChange(
   callback: (data: CharacterData) => void
 ): () => void {
-  return OBR.room.onMetadataChange((metadata) => {
+  return OBR.player.onMetadataChange((metadata) => {
     callback(normalizeCharacter(metadata[CHARACTER_KEY]));
   });
 }
