@@ -1,0 +1,12 @@
+{
+  "name": "sw5e character sheet",
+  "version": "0.0.1",
+  "manifest_version": 1,
+  "action": {
+    "title": "sw5e character sheet",
+    "icon": "/icon.svg",
+    "popover": "/",
+    "height": 600,
+    "width": 400
+  }
+}
