@@ -126,6 +126,15 @@ export async function updateSheet(
   });
 }
 
+export async function deleteSheet(sheetId: string): Promise<void> {
+  const store = await readStore();
+  const nextSheets = store.sheets.filter((sheet) => sheet.id !== sheetId);
+
+  await writeStore({
+    sheets: nextSheets,
+  });
+}
+
 export function onSheetsChange(
   callback: (data: CharacterSheet[]) => void
 ): () => void {

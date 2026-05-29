@@ -1,6 +1,7 @@
 import type { CharacterData, CharacterSheet } from "./state";
 
 type ChangeHandler = (sheetId: string, data: CharacterData) => void;
+type DeleteHandler = (sheetId: string) => Promise<void>;
 
 type CreateHandler = () => Promise<CharacterSheet>;
 
@@ -27,7 +28,9 @@ const escapeHtml = (value: string): string =>
 export function renderApp(
   root: HTMLElement,
   initialSheets: CharacterSheet[],
+  isGM: boolean,
   onCreateSheet: CreateHandler,
+  onDeleteSheet: DeleteHandler,
   onChange: ChangeHandler
 ): SheetUI {
   root.innerHTML = `
@@ -50,6 +53,7 @@ export function renderApp(
   let selectedSheetId: string | null = null;
   let draft: CharacterData | null = null;
   let isDirty = false;
+  let lastDeleteError = "";
 
   const getSelectedSheet = (): CharacterSheet | null => {
     if (!selectedSheetId) {
@@ -140,6 +144,11 @@ export function renderApp(
             Save edits
           </button>
         </div>
+        ${
+          lastDeleteError
+            ? `<p class="sheet__status sheet__status--error">${escapeHtml(lastDeleteError)}</p>`
+            : ""
+        }
         <section class="sheet__body">
           <label class="field" for="character-name">
             <span class="field__label">Character name</span>
@@ -159,6 +168,22 @@ export function renderApp(
             />
           </label>
         </section>
+        ${
+          isGM
+            ? `
+          <section class="sheet__danger-zone">
+            <p class="sheet__danger-title">Delete character</p>
+            <p class="sheet__danger-copy">Type DELETE to confirm permanent removal of this sheet.</p>
+            <div class="sheet__danger-row">
+              <input id="delete-confirm" name="delete-confirm" type="text" placeholder="DELETE" autocomplete="off" />
+              <button class="sheet__button sheet__button--danger" type="button" data-action="delete" disabled>
+                Delete character
+              </button>
+            </div>
+          </section>
+        `
+            : ""
+        }
       </section>
     `;
 
@@ -166,8 +191,10 @@ export function renderApp(
     const levelInput = content.querySelector<HTMLInputElement>("#character-level");
     const backButton = content.querySelector<HTMLButtonElement>('[data-action="back"]');
     const saveButton = content.querySelector<HTMLButtonElement>('[data-action="save"]');
+    const deleteInput = isGM ? content.querySelector<HTMLInputElement>("#delete-confirm") : null;
+    const deleteButton = isGM ? content.querySelector<HTMLButtonElement>('[data-action="delete"]') : null;
 
-    if (!nameInput || !levelInput || !backButton || !saveButton) {
+    if (!nameInput || !levelInput || !backButton || !saveButton || (isGM && (!deleteInput || !deleteButton))) {
       throw new Error("Sheet editor UI failed to render.");
     }
 
@@ -224,14 +251,46 @@ export function renderApp(
       saveButton.textContent = "Saved";
     });
 
+    if (isGM && deleteInput && deleteButton) {
+      deleteInput.addEventListener("input", () => {
+        deleteButton.disabled = deleteInput.value !== "DELETE";
+        if (deleteInput.value !== "DELETE") {
+          deleteButton.textContent = "Delete character";
+        }
+      });
+
+      deleteButton.addEventListener("click", async () => {
+        if (!selectedSheetId) {
+          return;
+        }
+
+        if (deleteInput.value !== "DELETE") {
+          lastDeleteError = "Type DELETE to confirm deletion.";
+          renderEditor();
+          return;
+        }
+
+        await onDeleteSheet(selectedSheetId);
+        selectedSheetId = null;
+        draft = null;
+        isDirty = false;
+        lastDeleteError = "";
+        renderSelection();
+      });
+    }
+
     backButton.addEventListener("click", () => {
       selectedSheetId = null;
       draft = null;
       isDirty = false;
+      lastDeleteError = "";
       renderSelection();
     });
 
     saveButton.disabled = true;
+    if (isGM && deleteButton && deleteInput) {
+      deleteButton.disabled = deleteInput.value !== "DELETE";
+    }
   };
 
   renderSelection();
