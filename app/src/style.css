@@ -70,7 +70,45 @@ body::before {
   font-size: clamp(28px, 4vw, 40px);
   letter-spacing: -0.04em;
   text-transform: lowercase;
-  margin: 0 0 32px;
+  margin: 0;
+}
+
+.sheet__eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sheet__content {
+  margin-top: 32px;
+}
+
+.sheet__selection,
+.sheet__editor {
+  display: grid;
+  gap: 18px;
+}
+
+.sheet__intro,
+.sheet__status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.sheet__list {
+  display: grid;
+  gap: 12px;
+}
+
+.sheet__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .sheet__body {
@@ -93,8 +131,71 @@ body::before {
   font-size: 12px;
 }
 
+button,
 input {
   font: 16px/1.4 var(--font-display);
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sheet__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 1px rgba(120, 104, 86, 0.2);
+  background: rgba(255, 255, 255, 0.84);
+  transition: border 200ms ease, box-shadow 200ms ease, transform 200ms ease, background 200ms ease;
+}
+
+.sheet__button:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px rgba(120, 104, 86, 0.28), 0 10px 24px rgba(28, 24, 18, 0.08);
+}
+
+.sheet__button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft), inset 0 0 0 1px rgba(120, 104, 86, 0.28);
+}
+
+.sheet__button--primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: none;
+}
+
+.sheet__button--primary:hover {
+  box-shadow: 0 12px 28px rgba(47, 107, 95, 0.2);
+}
+
+.sheet__button--ghost {
+  width: auto;
+  padding-inline: 14px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.sheet__button--sheet {
+  align-items: baseline;
+}
+
+.sheet__button-title {
+  font-weight: 600;
+}
+
+.sheet__button-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+input {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid transparent;
@@ -126,6 +227,10 @@ input:focus {
 @media (max-width: 720px) {
   #app {
     padding: 32px 16px 48px;
+  }
+
+  .sheet__toolbar {
+    align-items: stretch;
   }
 
   .sheet__body {

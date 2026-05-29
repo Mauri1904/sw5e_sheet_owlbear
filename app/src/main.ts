@@ -1,6 +1,6 @@
 import OBR from "@owlbear-rodeo/sdk";
 import "./style.css";
-import { getCharacter, onCharacterChange, setCharacter } from "./state";
+import { createSheet, getSheets, onSheetsChange, updateSheet } from "./state";
 import { renderApp } from "./ui";
 
 const root = document.querySelector<HTMLDivElement>("#app");
@@ -10,12 +10,17 @@ if (!root) {
 }
 
 OBR.onReady(async () => {
-  const initial = await getCharacter();
-  const ui = renderApp(root, initial, async (next) => {
-    await setCharacter(next);
-  });
+  const initial = await getSheets();
+  const ui = renderApp(
+    root,
+    initial,
+    async () => createSheet(),
+    async (sheetId, next) => {
+      await updateSheet(sheetId, next);
+    }
+  );
 
-  onCharacterChange((next) => {
-    ui.setCharacter(next);
+  onSheetsChange((next) => {
+    ui.setSheets(next);
   });
 });
