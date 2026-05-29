@@ -54,6 +54,7 @@ export function renderApp(
   let draft: CharacterData | null = null;
   let isDirty = false;
   let lastDeleteError = "";
+  let activeMenu: "info" = "info";
 
   const getSelectedSheet = (): CharacterSheet | null => {
     if (!selectedSheetId) {
@@ -142,21 +143,37 @@ export function renderApp(
 
     content.innerHTML = `
       <section class="sheet__editor">
+        <header class="sheet__hero">
+          <p class="sheet__eyebrow">Character sheet</p>
+          <h1 class="sheet__title">${escapeHtml((draft ?? sheet).name)}</h1>
+        </header>
         <div class="sheet__toolbar">
           <button class="sheet__button sheet__button--ghost" type="button" data-action="back">
             Back to sheets
           </button>
-          <p class="sheet__status">${escapeHtml(sheet.name)}${isDirty ? " • Unsaved changes" : ""}</p>
+          <p class="sheet__status">${isDirty ? "Unsaved changes" : "Saved"}</p>
           <button class="sheet__button sheet__button--primary sheet__button--save" type="button" data-action="save">
             Save edits
           </button>
         </div>
+        <nav class="sheet__menu" role="tablist" aria-label="Character sections">
+          <button class="sheet__menu-button ${activeMenu === "info" ? "sheet__menu-button--active" : ""}" type="button" data-action="menu-info" aria-selected="${activeMenu === "info" ? "true" : "false"}">Info</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-stats">Stats</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-inventory">Inventory</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-combat">Combat Mode</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-tech-force">Tech and Force Power</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-features">Features</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-proficiencies">Proficiencies & Languages</button>
+          <button class="sheet__menu-button" type="button" data-action="menu-flavour">Flavour</button>
+        </nav>
         ${
           lastDeleteError
             ? `<p class="sheet__status sheet__status--error">${escapeHtml(lastDeleteError)}</p>`
             : ""
         }
-        <section class="sheet__body">
+        <section class="sheet__panel sheet__panel--info" aria-label="Info">
+          <p class="sheet__panel-title">Info</p>
+          <div class="sheet__body">
           <label class="field" for="character-name">
             <span class="field__label">Character name</span>
             <input id="character-name" name="character-name" type="text" placeholder="Name" value="${escapeHtml((draft ?? sheet).name)}" />
@@ -202,6 +219,7 @@ export function renderApp(
             <span class="field__label">Player's Name</span>
             <input id="character-player" name="character-player" type="text" placeholder="Player's Name" value="${escapeHtml((draft ?? sheet).playerName ?? "")}" />
           </label>
+          </div>
         </section>
         ${
           isGM
@@ -233,15 +251,18 @@ export function renderApp(
     const xpNextInput = content.querySelector<HTMLInputElement>("#character-xp-next");
     const backButton = content.querySelector<HTMLButtonElement>('[data-action="back"]');
     const saveButton = content.querySelector<HTMLButtonElement>('[data-action="save"]');
+    const title = content.querySelector<HTMLHeadingElement>(".sheet__title");
+    const infoButton = content.querySelector<HTMLButtonElement>('[data-action="menu-info"]');
     const deleteInput = isGM ? content.querySelector<HTMLInputElement>("#delete-confirm") : null;
     const deleteButton = isGM ? content.querySelector<HTMLButtonElement>('[data-action="delete"]') : null;
 
-    if (!nameInput || !levelInput || !backButton || !saveButton || (isGM && (!deleteInput || !deleteButton))) {
+    if (!nameInput || !levelInput || !backButton || !saveButton || !title || !infoButton || (isGM && (!deleteInput || !deleteButton))) {
       throw new Error("Sheet editor UI failed to render.");
     }
 
     const applyDraft = (next: CharacterData) => {
       draft = next;
+      title.textContent = next.name;
       nameInput.value = next.name;
       levelInput.value = String(next.level);
       if (classesInput) classesInput.value = next.classes ?? "";
@@ -356,6 +377,11 @@ export function renderApp(
 
     levelInput.addEventListener("blur", () => {
       levelInput.value = String(getLevelInput());
+    });
+
+    infoButton.addEventListener("click", () => {
+      activeMenu = "info";
+      renderEditor();
     });
 
     saveButton.addEventListener("click", async () => {
