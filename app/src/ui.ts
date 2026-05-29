@@ -74,7 +74,7 @@ export function renderApp(
   const renderSelection = () => {
     content.innerHTML = `
       <section class="sheet__selection">
-        <p class="sheet__intro">Wähle ein Sheet aus dem Raum oder lege ein neues an.</p>
+        <p class="sheet__intro">select sheet or create a new one</p>
         <div class="sheet__list" role="list"></div>
         <button class="sheet__button sheet__button--primary" type="button" data-action="new-sheet">
           New Sheet
