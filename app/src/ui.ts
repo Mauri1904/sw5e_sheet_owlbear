@@ -67,6 +67,13 @@ export function renderApp(
     draft = {
       name: sheet.name,
       level: sheet.level,
+      classes: sheet.classes ?? "",
+      species: sheet.species ?? "",
+      alignment: sheet.alignment ?? "",
+      background: sheet.background ?? "",
+      playerName: sheet.playerName ?? "",
+      experience: sheet.experience ?? 0,
+      xpNext: sheet.xpNext ?? 0,
     };
     isDirty = false;
   };
@@ -167,6 +174,34 @@ export function renderApp(
               value="${String((draft ?? sheet).level)}"
             />
           </label>
+          <label class="field" for="character-experience">
+            <span class="field__label">Experience Points</span>
+            <input id="character-experience" name="character-experience" type="number" inputmode="numeric" min="0" step="1" value="${String((draft ?? sheet).experience ?? 0)}" />
+          </label>
+          <label class="field" for="character-xp-next">
+            <span class="field__label">XP Next Level</span>
+            <input id="character-xp-next" name="character-xp-next" type="number" inputmode="numeric" min="0" step="1" value="${String((draft ?? sheet).xpNext ?? 0)}" />
+          </label>
+          <label class="field" for="character-classes">
+            <span class="field__label">Class(es)</span>
+            <input id="character-classes" name="character-classes" type="text" placeholder="Class(es)" value="${escapeHtml((draft ?? sheet).classes ?? "")}" />
+          </label>
+          <label class="field" for="character-species">
+            <span class="field__label">Species</span>
+            <input id="character-species" name="character-species" type="text" placeholder="Species" value="${escapeHtml((draft ?? sheet).species ?? "")}" />
+          </label>
+          <label class="field" for="character-alignment">
+            <span class="field__label">Alignment</span>
+            <input id="character-alignment" name="character-alignment" type="text" placeholder="Alignment" value="${escapeHtml((draft ?? sheet).alignment ?? "")}" />
+          </label>
+          <label class="field" for="character-background">
+            <span class="field__label">Background</span>
+            <input id="character-background" name="character-background" type="text" placeholder="Background" value="${escapeHtml((draft ?? sheet).background ?? "")}" />
+          </label>
+          <label class="field" for="character-player">
+            <span class="field__label">Player's Name</span>
+            <input id="character-player" name="character-player" type="text" placeholder="Player's Name" value="${escapeHtml((draft ?? sheet).playerName ?? "")}" />
+          </label>
         </section>
         ${
           isGM
@@ -189,6 +224,13 @@ export function renderApp(
 
     const nameInput = content.querySelector<HTMLInputElement>("#character-name");
     const levelInput = content.querySelector<HTMLInputElement>("#character-level");
+    const classesInput = content.querySelector<HTMLInputElement>("#character-classes");
+    const speciesInput = content.querySelector<HTMLInputElement>("#character-species");
+    const alignmentInput = content.querySelector<HTMLInputElement>("#character-alignment");
+    const backgroundInput = content.querySelector<HTMLInputElement>("#character-background");
+    const playerInput = content.querySelector<HTMLInputElement>("#character-player");
+    const experienceInput = content.querySelector<HTMLInputElement>("#character-experience");
+    const xpNextInput = content.querySelector<HTMLInputElement>("#character-xp-next");
     const backButton = content.querySelector<HTMLButtonElement>('[data-action="back"]');
     const saveButton = content.querySelector<HTMLButtonElement>('[data-action="save"]');
     const deleteInput = isGM ? content.querySelector<HTMLInputElement>("#delete-confirm") : null;
@@ -202,6 +244,13 @@ export function renderApp(
       draft = next;
       nameInput.value = next.name;
       levelInput.value = String(next.level);
+      if (classesInput) classesInput.value = next.classes ?? "";
+      if (speciesInput) speciesInput.value = next.species ?? "";
+      if (alignmentInput) alignmentInput.value = next.alignment ?? "";
+      if (backgroundInput) backgroundInput.value = next.background ?? "";
+      if (playerInput) playerInput.value = next.playerName ?? "";
+      if (experienceInput) experienceInput.value = String(next.experience ?? 0);
+      if (xpNextInput) xpNextInput.value = String(next.xpNext ?? 0);
       isDirty = true;
       saveButton.disabled = false;
       saveButton.textContent = "Save edits";
@@ -212,6 +261,18 @@ export function renderApp(
     const getLevelInput = () => {
       const parsed = Number.parseInt(levelInput.value, 10);
       return clampLevel(Number.isFinite(parsed) ? parsed : sheet.level);
+    };
+
+    const getExperienceInput = () => {
+      const parsed = Number.parseInt(experienceInput?.value ?? "0", 10);
+      if (!Number.isFinite(parsed) || parsed < 0) return (sheet as any).experience ?? 0;
+      return Math.max(0, Math.floor(parsed));
+    };
+
+    const getXpNextInput = () => {
+      const parsed = Number.parseInt(xpNextInput?.value ?? "0", 10);
+      if (!Number.isFinite(parsed) || parsed < 0) return (sheet as any).xpNext ?? 0;
+      return Math.max(0, Math.floor(parsed));
     };
 
     nameInput.addEventListener("input", () => {
@@ -235,6 +296,63 @@ export function renderApp(
         level: getLevelInput(),
       });
     });
+
+    if (experienceInput) {
+      experienceInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, experience: getExperienceInput() });
+      });
+
+      experienceInput.addEventListener("blur", () => {
+        experienceInput.value = String(getExperienceInput());
+      });
+    }
+
+    if (xpNextInput) {
+      xpNextInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, xpNext: getXpNextInput() });
+      });
+
+      xpNextInput.addEventListener("blur", () => {
+        xpNextInput.value = String(getXpNextInput());
+      });
+    }
+
+    if (classesInput) {
+      classesInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, classes: classesInput.value.trim() });
+      });
+    }
+
+    if (speciesInput) {
+      speciesInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, species: speciesInput.value.trim() });
+      });
+    }
+
+    if (alignmentInput) {
+      alignmentInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, alignment: alignmentInput.value.trim() });
+      });
+    }
+
+    if (backgroundInput) {
+      backgroundInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, background: backgroundInput.value.trim() });
+      });
+    }
+
+    if (playerInput) {
+      playerInput.addEventListener("input", () => {
+        if (!selectedSheetId || !draft) return;
+        applyDraft({ ...draft, playerName: playerInput.value.trim() });
+      });
+    }
 
     levelInput.addEventListener("blur", () => {
       levelInput.value = String(getLevelInput());

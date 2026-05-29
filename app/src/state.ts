@@ -3,6 +3,13 @@ import OBR from "@owlbear-rodeo/sdk";
 export type CharacterData = {
   name: string;
   level: number;
+  classes: string;
+  species: string;
+  alignment: string;
+  background: string;
+  playerName: string;
+  experience: number;
+  xpNext: number;
 };
 
 export type CharacterSheet = CharacterData & {
@@ -17,6 +24,13 @@ const SHEETS_KEY = "com.mauri.sw5e.sheets";
 const DEFAULT_CHARACTER: CharacterData = {
   name: "New Character",
   level: 1,
+  classes: "",
+  species: "",
+  alignment: "",
+  background: "",
+  playerName: "",
+  experience: 0,
+  xpNext: 0,
 };
 
 const clampLevel = (value: number): number => {
@@ -46,8 +60,17 @@ const normalizeCharacter = (value: unknown): CharacterData => {
       ? record.name
       : DEFAULT_CHARACTER.name;
   const level = clampLevel(Number(record.level));
+  const classes = typeof record.classes === "string" ? record.classes : DEFAULT_CHARACTER.classes;
+  const species = typeof record.species === "string" ? record.species : DEFAULT_CHARACTER.species;
+  const alignment = typeof record.alignment === "string" ? record.alignment : DEFAULT_CHARACTER.alignment;
+  const background = typeof record.background === "string" ? record.background : DEFAULT_CHARACTER.background;
+  const playerName = typeof record.playerName === "string" ? record.playerName : DEFAULT_CHARACTER.playerName;
+  const experienceRaw = Number(record.experience);
+  const experience = Number.isFinite(experienceRaw) && experienceRaw >= 0 ? Math.floor(experienceRaw) : DEFAULT_CHARACTER.experience;
+  const xpNextRaw = Number(record.xpNext);
+  const xpNext = Number.isFinite(xpNextRaw) && xpNextRaw >= 0 ? Math.floor(xpNextRaw) : DEFAULT_CHARACTER.xpNext;
 
-  return { name, level };
+  return { name, level, classes, species, alignment, background, playerName, experience, xpNext };
 };
 
 const normalizeSheet = (value: unknown): CharacterSheet | null => {
